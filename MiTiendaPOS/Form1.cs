@@ -1,43 +1,60 @@
 using Microsoft.EntityFrameworkCore;
 using MiTiendaPOS.Data;
+using MiTiendaPOS.Forms;
+using System.Globalization;
 
 namespace MiTiendaPOS
 {
-    public partial class Form1 : Form
+    public partial class FrmPrincipal : Form
     {
-        public Form1()
+        public FrmPrincipal()
         {
             InitializeComponent();
+        }
+        //Método generico para abrir cualquier formulario como ventana modal
+        private void AbrirFormulario<T>() where T : Form, new()
+        {
+            try
+            {
+                using var form = new T();
+                form.StartPosition = FormStartPosition.CenterParent;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo abrir el formulario", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            /* using var contexto = new MiTiendaPOSContext();
-             MessageBox.Show("Contexto creado correctamente.");*/
+            var region = new CultureInfo("es-SV");
+            lblFecha.Text = DateTime.Now.ToString("dddd, dd 'de' MMMM 'de' yyyy", region);
+            lblEstado.Text = "Listo!";
+        }
 
-            try
-            {
-                using var contexto = new MiTiendaPOSContext();
+        private void btnCategoria_Click(object sender, EventArgs e)
+        {
+            FrmCategorias form = new FrmCategorias();
+            form.ShowDialog();
+        }
 
-                bool conecta = contexto.Database.CanConnect();
-                int categorias = contexto.Categorias.Count();
-                int usuarios = contexto.Usuarios.Count();
-                int pendientes = contexto.Database.GetPendingMigrations().Count();
+        private void btnVentas_Click(object sender, EventArgs e) => AbrirFormulario<FrmVentas>();
 
-                MessageBox.Show(
-                    $"Conexión a MiTiendaPOSDb: {(conecta ? "OK" : "FALLÓ")}\n" +
-                    $"Categorías registradas: {categorias}\n" +
-                    $"Usuarios registrados: {usuarios}\n" +
-                    $"Migraciones pendientes: {pendientes}",
-                    "MiTiendaPOS", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }   // <- al salir del bloque try se ejecuta Dispose() del contexto
-                // El manejo de excepciones se profundiza en la Unidad 4
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al conectar: " + ex.Message, "MiTiendaPOS",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+        private void btnClientes_Click(object sender, EventArgs e)
+        {
+            FrmClientes form = new FrmClientes();
+            form.ShowDialog();
+        }
 
+        private void dgvClientes_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void btnProductos_Click(object sender, EventArgs e)
+        {
+            FrmProductos form = new FrmProductos();
+            form.ShowDialog();
         }
     }
 }

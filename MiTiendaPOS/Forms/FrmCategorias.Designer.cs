@@ -46,9 +46,9 @@
             lblFiltro.AutoSize = true;
             lblFiltro.Location = new Point(17, 35);
             lblFiltro.Name = "lblFiltro";
-            lblFiltro.Size = new Size(57, 20);
+            lblFiltro.Size = new Size(55, 20);
             lblFiltro.TabIndex = 0;
-            lblFiltro.Text = "BUscar:";
+            lblFiltro.Text = "Buscar:";
             // 
             // txtBuscar
             // 
@@ -157,6 +157,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FrmCategorias";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Mantenimiento Categorías";
             Load += FrmCategorias_Load;
             ((System.ComponentModel.ISupportInitialize)dgvCategorias).EndInit();

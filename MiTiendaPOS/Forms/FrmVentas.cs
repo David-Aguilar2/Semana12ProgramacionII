@@ -1,4 +1,5 @@
-﻿using MiTiendaPOS.Dtos;
+﻿using Microsoft.EntityFrameworkCore;
+using MiTiendaPOS.Dtos;
 using MiTiendaPOS.Models;
 using MiTiendaPOS.Services;
 using System;
@@ -171,21 +172,38 @@ namespace MiTiendaPOS.Forms
         private void btnEliminar_Click(object sender, EventArgs e)
         {
             if (_ventaId == 0) return;
+
             var respuesta = MessageBox.Show(
-            $"¿Eliminar la venta #{_ventaId}? Se devolverá el stock.",
-            "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                $"¿Eliminar la venta #{_ventaId}?\nSe devolverá al inventario el stock de sus productos.",
+                "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
             if (respuesta != DialogResult.Yes) return;
+
             try
             {
-                _servicio.Eliminar(_ventaId);
-                CargarCatalogos();
+                int idEliminado = _ventaId;          // se guarda antes de que NuevaVenta() lo reinicie
+                _servicio.Eliminar(idEliminado);
+
+                CargarCatalogos();                   // refresca el stock en el combo de productos
                 CargarHistorial();
                 NuevaVenta();
+
+                MessageBox.Show($"La venta #{idEliminado} fue eliminada y el stock fue devuelto al inventario.",
+                    "Venta eliminada", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
+            catch (DbUpdateException ex)             // errores al ejecutar el DELETE en SQL Server
             {
-                MessageBox.Show(ex.Message, "No se pudo eliminar",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    $"No se pudo eliminar la venta #{_ventaId}. No se modificó el stock.\n\n" +
+                    $"Detalle: {ex.InnerException?.Message ?? ex.Message}",
+                    "Error de base de datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)                     // validaciones del servicio u otros fallos
+            {
+                MessageBox.Show(
+                    $"No se pudo eliminar la venta #{_ventaId}. No se modificó el stock.\n\n" +
+                    $"Detalle: {ex.Message}",
+                    "No se pudo eliminar", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

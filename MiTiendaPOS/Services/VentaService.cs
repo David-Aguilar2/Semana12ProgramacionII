@@ -107,12 +107,14 @@ namespace MiTiendaPOS.Services
             Venta venta = ctx.Ventas.Include(v => v.Detalles)
             .FirstOrDefault(v => v.Id == ventaId)
             ?? throw new InvalidOperationException("La venta ya no existe.");
+
             foreach (var d in venta.Detalles)
             {
                 Producto? producto = ctx.Productos.Find(d.ProductoId);
                 if (producto != null) producto.Stock += d.Cantidad;
             }
-            ctx.Ventas.Remove(venta); // Cascade -> también sus DetalleVenta
+            ctx.DetallesVenta.RemoveRange(venta.Detalles);// 1) Borramos primero los hijos
+            ctx.Ventas.Remove(venta); // Cascade -> también sus DetalleVenta 2)Luego al maestro
             ctx.SaveChanges();
         }
         // ----- Lógica compartida: validamos stock, lo descontamos y armamos las líneas -----
